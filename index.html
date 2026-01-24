@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Office Barnett</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0a0a0a;
+            font-family: 'VT323', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated grid background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+        }
+
+        /* Horizon grid */
+        .horizon {
+            position: fixed;
+            bottom: 0;
+            left: -50%;
+            width: 200%;
+            height: 40vh;
+            background: 
+                linear-gradient(90deg, rgba(255, 0, 255, 0.15) 1px, transparent 1px),
+                linear-gradient(rgba(255, 0, 255, 0.1) 1px, transparent 1px);
+            background-size: 80px 40px;
+            transform: perspective(200px) rotateX(60deg);
+            transform-origin: center top;
+            animation: horizonMove 2s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes horizonMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 40px; }
+        }
+
+        /* CRT scan lines */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        /* Glowing sun/orb */
+        .sun {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(180deg, #ff6b6b 0%, #ff00ff 50%, #4a0080 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px #ff00ff,
+                0 0 100px #ff006680,
+                inset 0 0 60px rgba(255, 255, 255, 0.3);
+            z-index: 1;
+        }
+
+        .sun::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 8px,
+                #0a0a0a 8px,
+                #0a0a0a 12px
+            );
+        }
+
+        /* Main content */
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* Title */
+        .title-container {
+            text-align: center;
+            margin-top: 60px;
+            margin-bottom: 60px;
+        }
+
+        .welcome {
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+            color: #00ffff;
+            text-shadow: 0 0 10px #00ffff;
+            letter-spacing: 8px;
+            animation: flicker 3s infinite;
+        }
+
+        .title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(180deg, #fff 0%, #ff00ff 50%, #00ffff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            filter: drop-shadow(0 0 20px rgba(255, 0, 255, 0.5));
+            margin-top: 10px;
+            letter-spacing: 4px;
+        }
+
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.8; }
+            94% { opacity: 1; }
+            95% { opacity: 0.9; }
+            96% { opacity: 1; }
+        }
+
+        /* App cards */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            max-width: 900px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.9) 0%, rgba(10, 10, 20, 0.95) 100%);
+            border: 2px solid #ff00ff;
+            border-radius: 0;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 40%, rgba(255, 0, 255, 0.1) 50%, transparent 60%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .app-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .app-card:hover {
+            border-color: #00ffff;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .app-card.coming-soon {
+            border-color: #444;
+            opacity: 0.7;
+        }
+
+        .app-card.coming-soon:hover {
+            border-color: #666;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .app-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .app-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .app-description {
+            font-size: 1.2rem;
+            color: #888;
+            line-height: 1.4;
+        }
+
+        .app-status {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 5px 15px;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-live {
+            background: linear-gradient(90deg, #00ff00, #00aa00);
+            color: #000;
+            animation: pulse 2s infinite;
+        }
+
+        .status-coming {
+            background: #333;
+            color: #666;
+            border: 1px solid #444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 5px #00ff00; }
+            50% { box-shadow: 0 0 20px #00ff00, 0 0 30px #00ff0050; }
+        }
+
+        .app-link {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: auto;
+            padding: 40px 20px;
+            text-align: center;
+            color: #444;
+            font-size: 1rem;
+        }
+
+        .footer-text {
+            animation: textGlitch 5s infinite;
+        }
+
+        .team-link {
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #333;
+            text-decoration: none;
+            letter-spacing: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .team-link:hover {
+            color: #ff00ff;
+            text-shadow: 0 0 10px #ff00ff;
+        }
+
+        @keyframes textGlitch {
+            0%, 100% { text-shadow: none; }
+            90% { text-shadow: none; }
+            91% { text-shadow: -2px 0 #ff0000, 2px 0 #00ffff; }
+            92% { text-shadow: none; }
+            93% { text-shadow: 2px 0 #ff0000, -2px 0 #00ffff; }
+            94% { text-shadow: none; }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            .welcome {
+                font-size: 1rem;
+                letter-spacing: 4px;
+            }
+            .sun {
+                width: 100px;
+                height: 100px;
+                top: 10%;
+            }
+        }
+
+        /* Corner decorations */
+        .corner {
+            position: fixed;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #ff00ff40;
+            z-index: 5;
+        }
+        .corner-tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .corner-tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .corner-bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .corner-br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+    </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="horizon"></div>
+    <div class="sun"></div>
+    <div class="scanlines"></div>
+    
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="container">
+        <div class="title-container">
+            <div class="welcome">WELCOME TO....</div>
+            <h1 class="title">THE OFFICE BARNETT</h1>
+        </div>
+
+        <div class="apps-grid">
+            <a href="https://mayfair-portfolio.vercel.app/" target="_blank" class="app-link">
+                <div class="app-card">
+                    <div class="app-icon">🏠</div>
+                    <div class="app-name">Mayfair Portfolio</div>
+                    <div class="app-description">Real estate portfolio management for Lakeland properties</div>
+                    <div class="app-status status-live">● ONLINE</div>
+                </div>
+            </a>
+
+            <div class="app-card coming-soon">
+                <div class="app-icon">✈️</div>
+                <div class="app-name">NetJets Tracker</div>
+                <div class="app-description">Flight usage, hours, and booking management</div>
+                <div class="app-status status-coming">COMING SOON</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-text">[ BARNETT OFFICE SYSTEMS v1.0 ]</div>
+            <a href="team.html" class="team-link">meet the party</a>
+        </div>
+    </div>
+</body>
+</html>
