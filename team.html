@@ -330,6 +330,117 @@
             0%, 100% { transform: translateY(0) rotate(0deg); }
             50% { transform: translateY(-20px) rotate(10deg); }
         }
+
+        /* Contact popup overlay */
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .popup-overlay.active {
+            display: flex;
+        }
+
+        .popup {
+            background: linear-gradient(180deg, #1a1a4a 0%, #0a0a2a 100%);
+            border: 4px solid #4a4a8a;
+            padding: 30px 36px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow:
+                inset 2px 2px 0 #6a6aaa,
+                inset -2px -2px 0 #2a2a5a,
+                0 0 60px rgba(100, 100, 200, 0.5);
+            position: relative;
+            animation: popupIn 0.15s ease-out;
+        }
+
+        @keyframes popupIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .popup-name {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1.1rem;
+            color: #f0e68c;
+            text-shadow: 2px 2px 0 #000;
+            margin-bottom: 6px;
+        }
+
+        .popup-class {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            color: #8888ff;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .popup-divider {
+            border: none;
+            border-top: 2px solid #2a2a5a;
+            margin-bottom: 18px;
+        }
+
+        .popup-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .popup-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.5rem;
+            color: #f0e68c;
+            min-width: 60px;
+        }
+
+        .popup-value {
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        .popup-value a {
+            color: #88ccff;
+            text-decoration: none;
+        }
+
+        .popup-value a:hover {
+            color: #f0e68c;
+            text-shadow: 0 0 8px rgba(240, 230, 140, 0.5);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.7rem;
+            color: #888;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .popup-close:hover {
+            color: #f0e68c;
+        }
+
+        .character {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -450,5 +561,79 @@
             <div class="menu-hint">▼ PRESS START ▼</div>
         </div>
     </div>
+
+    <!-- Contact popup -->
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup">
+            <button class="popup-close" id="popupClose">✕</button>
+            <div class="popup-name" id="popupName"></div>
+            <div class="popup-class" id="popupClass"></div>
+            <hr class="popup-divider">
+            <div id="popupBody"></div>
+        </div>
+    </div>
+
+    <script>
+        var contacts = {
+            WESLEY: {
+                role: 'Son',
+                email: 'wesley@barnettoffice.com',
+                phone: '(555) 111-2222',
+                location: 'Front Lines'
+            },
+            NICHOLAS: {
+                role: 'Son',
+                email: 'nicholas@barnettoffice.com',
+                phone: '(555) 333-4444',
+                location: 'Front Lines'
+            },
+            DAVID: {
+                role: 'Dark Knight',
+                email: 'david@barnettoffice.com',
+                phone: '(555) 555-6666',
+                location: 'The Keep'
+            },
+            CHAD: {
+                role: 'Cleric',
+                email: 'chad@barnettoffice.com',
+                phone: '(555) 777-8888',
+                location: 'The Sanctuary'
+            }
+        };
+
+        var overlay = document.getElementById('popupOverlay');
+        var popupName = document.getElementById('popupName');
+        var popupClass = document.getElementById('popupClass');
+        var popupBody = document.getElementById('popupBody');
+
+        document.querySelectorAll('.character').forEach(function(el) {
+            el.addEventListener('click', function() {
+                var nameEl = el.querySelector('.char-name');
+                var name = nameEl.textContent.replace('▶', '').trim();
+                var info = contacts[name];
+                if (!info) return;
+
+                popupName.textContent = name;
+                popupClass.textContent = info.role;
+                popupBody.innerHTML =
+                    '<div class="popup-row"><span class="popup-label">EMAIL</span><span class="popup-value"><a href="mailto:' + info.email + '">' + info.email + '</a></span></div>' +
+                    '<div class="popup-row"><span class="popup-label">PHONE</span><span class="popup-value"><a href="tel:' + info.phone + '">' + info.phone + '</a></span></div>' +
+                    '<div class="popup-row"><span class="popup-label">LOC</span><span class="popup-value">' + info.location + '</span></div>';
+                overlay.classList.add('active');
+            });
+        });
+
+        document.getElementById('popupClose').addEventListener('click', function() {
+            overlay.classList.remove('active');
+        });
+
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) overlay.classList.remove('active');
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') overlay.classList.remove('active');
+        });
+    </script>
 </body>
 </html>
